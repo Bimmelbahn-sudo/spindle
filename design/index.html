@@ -162,6 +162,91 @@
   @media (prefers-reduced-motion: reduce) { .record { animation: none; } }
 
   @media (max-width: 760px) { .layout { gap: 40px; } }
+
+  /* ============================================================
+     SPINDLE — Futuristic "Flux" skin: app screen + app icon.
+     Everything below is namespaced with `flux-` prefixed classes
+     (plus a couple of same-specificity-safe combo overrides like
+     `.chip.flux-chip`) and does not edit any rule above. Holographic
+     glass, conic iridescent gradients, monospace HUD accents.
+     ============================================================ */
+  :root {
+    --flux-bg-0: #05060f;
+    --flux-bg-1: #0a0d1c;
+    --flux-bg-2: #131736;
+    --flux-cyan: #2fe6ff;
+    --flux-violet: #7c5cff;
+    --flux-magenta: #ff59d6;
+    --flux-ink: #eef4ff;
+    --flux-dim: #9fb0d9;
+    --flux-line: rgba(255,255,255,.14);
+    --flux-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+
+  .flux-divider { width: min(640px, 86vw); height: 1px; margin: 6px 0 -8px; position: relative; background: linear-gradient(90deg, transparent, var(--flux-violet) 22%, var(--flux-cyan) 50%, var(--flux-magenta) 78%, transparent); opacity: .55; }
+  .flux-divider::after { content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); background: #fff; box-shadow: 0 0 14px 4px rgba(124,92,255,.8); }
+  .flux-kicker { font-size: 12px; letter-spacing: .32em; text-transform: uppercase; color: var(--flux-violet); font-weight: 800; margin: 0 0 8px; }
+
+  /* ---- screen ---- */
+  .flux-screen { position: relative; width: 100%; height: 100%; border-radius: 32px; overflow: hidden; display: flex; flex-direction: column; background: radial-gradient(60% 40% at 15% 6%, rgba(47,230,255,.18), transparent 60%), radial-gradient(55% 38% at 92% 4%, rgba(255,89,214,.15), transparent 60%), radial-gradient(120% 100% at 50% -8%, var(--flux-bg-2), var(--flux-bg-1) 55%, var(--flux-bg-0) 100%); }
+
+  .flux-top { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px 6px; position: relative; z-index: 4; }
+  .flux-brand { display: flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: .14em; font-size: 13px; color: var(--flux-ink); text-transform: uppercase; font-family: var(--flux-mono); }
+  .flux-logo-dot { width: 14px; height: 14px; border-radius: 50%; background: conic-gradient(from 0deg, var(--flux-cyan), var(--flux-violet), var(--flux-magenta), var(--flux-cyan)); box-shadow: 0 0 10px 2px rgba(124,92,255,.7); }
+  .flux-np { font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: var(--flux-dim); font-weight: 700; font-family: var(--flux-mono); }
+
+  .flux-deckwrap { position: relative; flex: 1; }
+  .flux-platter { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 250px; height: 250px; z-index: 2; }
+  .flux-ring { position: absolute; inset: 12px; border-radius: 50%; background: conic-gradient(from 0deg, var(--flux-cyan), var(--flux-violet), var(--flux-magenta), var(--flux-cyan)); box-shadow: 0 0 40px 6px rgba(124,92,255,.4), 0 0 90px 26px rgba(47,230,255,.15); animation: spin 16s linear infinite; }
+  .flux-ring::before { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: var(--flux-bg-1); }
+  .flux-orbit { position: absolute; inset: 0; animation: spin 10s linear infinite reverse; }
+  .flux-orbit-dot { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--flux-cyan); box-shadow: 0 0 10px 3px rgba(47,230,255,.85), 0 0 24px 10px rgba(124,92,255,.4); }
+  .flux-orbit-dot.a { top: 4px; left: 50%; transform: translateX(-50%); }
+  .flux-orbit-dot.b { bottom: 20px; right: 8px; background: var(--flux-magenta); box-shadow: 0 0 10px 3px rgba(255,89,214,.85), 0 0 24px 10px rgba(124,92,255,.35); }
+  .flux-art { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; width: 192px; height: 192px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(120% 120% at 28% 22%, rgba(47,230,255,.85) 0%, transparent 45%), radial-gradient(120% 120% at 78% 82%, rgba(255,89,214,.8) 0%, transparent 50%), linear-gradient(160deg, #241b4d, #0d1030 65%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 10px 32px -12px rgba(0,0,0,.65); }
+  .flux-core { width: 15%; height: 15%; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, var(--flux-cyan) 55%, var(--flux-violet) 100%); box-shadow: 0 0 14px 4px rgba(124,92,255,.75); }
+
+  .flux-panel { position: relative; z-index: 3; margin-top: auto; border-radius: 26px 26px 0 0; padding: 20px 22px 26px; border-top: 1px solid var(--flux-line); background: linear-gradient(180deg, rgba(26,31,58,.7), rgba(8,10,22,.88)); box-shadow: 0 -8px 30px -14px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06); }
+  .flux-meta { position: relative; z-index: 2; }
+  .flux-title { font-size: 20px; font-weight: 800; letter-spacing: -.01em; background: linear-gradient(90deg, #fff, var(--flux-cyan) 65%, var(--flux-violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .flux-artist { font-size: 12px; color: var(--flux-dim); margin-top: 3px; font-family: var(--flux-mono); letter-spacing: .04em; text-transform: uppercase; }
+
+  .flux-slider { margin: 17px 0 4px; }
+  .flux-track { height: 4px; border-radius: 4px; background: rgba(255,255,255,.12); position: relative; }
+  .flux-fill { position: absolute; left: 0; top: 0; height: 100%; width: 37%; border-radius: 4px; background: linear-gradient(90deg, var(--flux-cyan), var(--flux-violet), var(--flux-magenta)); box-shadow: 0 0 12px 2px rgba(124,92,255,.7); }
+  .flux-knob { position: absolute; left: 37%; top: 50%; width: 11px; height: 11px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%); box-shadow: 0 0 0 4px rgba(124,92,255,.35), 0 0 14px 4px rgba(47,230,255,.8); }
+  .flux-times { display: flex; justify-content: space-between; margin-top: 9px; font-size: 10px; font-family: var(--flux-mono); color: var(--flux-dim); letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+
+  .flux-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 15px; }
+  .flux-btn { appearance: none; cursor: pointer; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--flux-line); color: var(--flux-ink); display: grid; place-items: center; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.03)); box-shadow: 0 6px 16px -6px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1); transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+  .flux-btn:hover { border-color: rgba(127,233,255,.55); }
+  .flux-btn:active { transform: translateY(2px); }
+  .flux-btn:focus-visible { outline: 2px solid var(--flux-cyan); outline-offset: 3px; }
+  .flux-btn svg { width: 20px; height: 20px; fill: currentColor; display: block; }
+  .flux-btn.flux-play { width: 64px; height: 64px; color: #0a0d1a; border-color: rgba(255,255,255,.35); background: conic-gradient(from 180deg, var(--flux-cyan), var(--flux-violet), var(--flux-magenta), var(--flux-cyan)); box-shadow: 0 0 26px 4px rgba(124,92,255,.55), 0 10px 22px -8px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.3); }
+  .flux-btn.flux-play svg { width: 26px; height: 26px; }
+
+  .flux-trim { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+  .flux-bars { display: flex; align-items: flex-end; gap: 3px; height: 16px; }
+  .flux-bars i { width: 3px; border-radius: 2px; background: linear-gradient(180deg, var(--flux-cyan), var(--flux-violet)); animation: flux-eq 1.1s ease-in-out infinite; }
+  .flux-bars i:nth-child(1) { height: 40%; animation-delay: -.9s; }
+  .flux-bars i:nth-child(2) { height: 90%; animation-delay: -.5s; }
+  .flux-bars i:nth-child(3) { height: 60%; animation-delay: -1.1s; }
+  .flux-bars i:nth-child(4) { height: 100%; animation-delay: -.2s; }
+  .flux-bars i:nth-child(5) { height: 50%; animation-delay: -.7s; }
+  .flux-badge { font-family: var(--flux-mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; color: var(--flux-cyan); background: rgba(47,230,255,.08); border: 1px solid rgba(47,230,255,.35); }
+
+  /* ---- app icon ---- */
+  .appicon.flux-appicon { background: radial-gradient(120% 120% at 30% 15%, #1b2358 0%, transparent 55%), linear-gradient(160deg, var(--flux-bg-2), var(--flux-bg-0)); }
+  .flux-rec { width: 66%; height: 66%; border-radius: 50%; position: relative; display: grid; place-items: center; background: conic-gradient(from 0deg, var(--flux-cyan), var(--flux-violet), var(--flux-magenta), var(--flux-cyan)); box-shadow: 0 3px 10px -3px rgba(0,0,0,.5), 0 0 18px 3px rgba(124,92,255,.55); }
+  .flux-rec::before { content: ""; position: absolute; inset: 12%; border-radius: 50%; background: var(--flux-bg-1); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+  .flux-ctr { width: 40%; height: 40%; border-radius: 50%; background: linear-gradient(160deg, #1c2350, #0a0d1a); display: grid; place-items: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); position: relative; z-index: 2; }
+  .flux-hole { width: 22%; height: 22%; border-radius: 50%; background: var(--flux-ink); box-shadow: 0 0 8px 2px rgba(127,233,255,.9); }
+
+  .caption .chip.flux-chip { background: rgba(124,92,255,.14); border-color: rgba(124,92,255,.4); }
+
+  @keyframes flux-eq { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .flux-ring, .flux-orbit, .flux-bars i { animation: none; } }
 </style>
 </head>
 <body>
@@ -233,6 +318,72 @@
       <span class="chip">Icon reads down to 32px</span>
     </div>
     <p>Original artwork in this flat-retro style &mdash; not the stock images. The <strong>Flux</strong> vibe reuses the same technique with a holographic palette. Cassette &amp; iPod could become additional switchable skins.</p>
+  </div>
+
+  <div class="flux-divider" aria-hidden="true"></div>
+
+  <div class="head">
+    <p class="flux-kicker">Spindle &middot; Futuristic vibe &middot; Flux skin</p>
+    <h1>The same now-playing screen, refracted into light</h1>
+    <p>Album art sits inside a spinning holographic halo, and every control keeps its turntable counterpart's job &mdash; just dressed for a different decade.</p>
+  </div>
+
+  <div class="layout">
+
+    <!-- app screen -->
+    <div class="phone">
+      <div class="flux-screen">
+        <div class="flux-top">
+          <div class="flux-brand"><span class="flux-logo-dot"></span> Spindle</div>
+          <div class="flux-np">Now Playing</div>
+        </div>
+        <div class="flux-deckwrap">
+          <div class="flux-platter">
+            <div class="flux-ring"></div>
+            <div class="flux-orbit"><span class="flux-orbit-dot a"></span><span class="flux-orbit-dot b"></span></div>
+            <div class="flux-art"><span class="flux-core"></span></div>
+          </div>
+        </div>
+        <div class="flux-panel">
+          <div class="flux-meta">
+            <div class="flux-title">Midnight City</div>
+            <div class="flux-artist">M83</div>
+          </div>
+          <div class="flux-slider">
+            <div class="flux-track"><span class="flux-fill"></span><span class="flux-knob"></span></div>
+            <div class="flux-times"><span>1:47</span><span>4:03</span></div>
+          </div>
+          <div class="flux-controls">
+            <button class="flux-btn" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M7 6h2v12H7zm3.5 6L19 6v12z"/></svg></button>
+            <button class="flux-btn flux-play" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M8 5h3v14H8zm5 0h3v14h-3z"/></svg></button>
+            <button class="flux-btn" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M15 6h2v12h-2zM5 6l8.5 6L5 18z"/></svg></button>
+          </div>
+          <div class="flux-trim">
+            <div class="flux-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="flux-badge">Lossless</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- app icon -->
+    <div class="icons">
+      <div class="icon-caption">App icon</div>
+      <div class="icon-row">
+        <div><div class="appicon flux-appicon md"><div class="flux-rec"><div class="flux-ctr"><span class="flux-hole"></span></div></div></div><div class="icon-size">72</div></div>
+        <div><div class="appicon flux-appicon sm"><div class="flux-rec"><div class="flux-ctr"><span class="flux-hole"></span></div></div></div><div class="icon-size">48</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="caption">
+    <div class="row">
+      <span class="chip flux-chip">Glassmorphism &middot; conic gradients</span>
+      <span class="chip flux-chip">Ring spins &middot; light points orbit</span>
+      <span class="chip flux-chip">Icon reads down to 48px</span>
+    </div>
+    <p>Same disc-in-frame anatomy as Turntable, rebuilt as holographic glass. Reduced-motion visitors get a still frame &mdash; no spin, no orbit.</p>
   </div>
 
 </body>
