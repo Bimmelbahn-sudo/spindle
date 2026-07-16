@@ -32,28 +32,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.markfoundry.spindle.player.NoopControls
 import com.markfoundry.spindle.player.NowPlaying
 import com.markfoundry.spindle.player.PlayerControls
 import com.markfoundry.spindle.player.PreviewNowPlaying
+import com.markfoundry.spindle.ui.NextIcon
+import com.markfoundry.spindle.ui.PauseIcon
+import com.markfoundry.spindle.ui.PlayIcon
+import com.markfoundry.spindle.ui.PrevIcon
 
-// Flat-retro turntable palette.
 private val Coral = Color(0xFFE8645A)
 private val Navy = Color(0xFF2B356A)
 private val NavyLine = Color(0xFF3C4890)
@@ -84,9 +90,7 @@ private fun TurntableScreen(state: NowPlaying, controls: PlayerControls) {
             .systemBarsPadding(),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 22.dp, vertical = 14.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 14.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -95,14 +99,11 @@ private fun TurntableScreen(state: NowPlaying, controls: PlayerControls) {
         }
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 22.dp),
+            modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 22.dp),
             contentAlignment = Alignment.Center,
         ) {
             Box(modifier = Modifier.fillMaxWidth(0.9f).aspectRatio(1f)) {
-                Record(isPlaying = state.isPlaying, modifier = Modifier.fillMaxSize())
+                Record(artwork = state.artwork, isPlaying = state.isPlaying, modifier = Modifier.fillMaxSize())
                 Tonearm(isPlaying = state.isPlaying, modifier = Modifier.fillMaxSize())
             }
         }
@@ -112,7 +113,7 @@ private fun TurntableScreen(state: NowPlaying, controls: PlayerControls) {
 }
 
 @Composable
-private fun Record(isPlaying: Boolean, modifier: Modifier = Modifier) {
+private fun Record(artwork: ImageBitmap?, isPlaying: Boolean, modifier: Modifier = Modifier) {
     val rotation = remember { Animatable(0f) }
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
@@ -136,39 +137,50 @@ private fun Record(isPlaying: Boolean, modifier: Modifier = Modifier) {
             r -= 3.5.dp.toPx()
         }
         drawCircle(color = Cream.copy(alpha = 0.85f), radius = outer * 0.9f, center = c, style = Stroke(width = 1.5.dp.toPx()))
-        drawCircle(
-            brush = Brush.linearGradient(
-                colors = listOf(Color(0xFF2F5F96), Color(0xFFD7823F)),
-                start = Offset(c.x - labelR, c.y - labelR),
-                end = Offset(c.x + labelR, c.y + labelR),
-            ),
-            radius = labelR,
-            center = c,
-        )
+        if (artwork != null) {
+            val d = (labelR * 2f).toInt()
+            clipPath(Path().apply { addOval(Rect(c.x - labelR, c.y - labelR, c.x + labelR, c.y + labelR)) }) {
+                drawImage(
+                    image = artwork,
+                    dstOffset = IntOffset((c.x - labelR).toInt(), (c.y - labelR).toInt()),
+                    dstSize = IntSize(d, d),
+                )
+            }
+        } else {
+            drawCircle(
+                brush = Brush.linearGradient(
+                    colors = listOf(Color(0xFF2F5F96), Color(0xFFD7823F)),
+                    start = Offset(c.x - labelR, c.y - labelR),
+                    end = Offset(c.x + labelR, c.y + labelR),
+                ),
+                radius = labelR,
+                center = c,
+            )
+        }
         drawCircle(color = Cream, radius = labelR, center = c, style = Stroke(width = 3.dp.toPx()))
-        drawCircle(color = Coral, radius = outer * 0.05f, center = c)
+        drawCircle(color = Coral, radius = outer * 0.045f, center = c)
     }
 }
 
 @Composable
 private fun Tonearm(isPlaying: Boolean, modifier: Modifier = Modifier) {
     val lift by animateFloatAsState(
-        targetValue = if (isPlaying) 0f else -20f,
+        targetValue = if (isPlaying) 0f else -22f,
         animationSpec = tween(500),
         label = "tonearm-lift",
     )
     Canvas(
         modifier = modifier.graphicsLayer {
             rotationZ = lift
-            transformOrigin = TransformOrigin(0.82f, 0.14f)
+            transformOrigin = TransformOrigin(0.85f, 0.12f)
         },
     ) {
-        val pivot = Offset(size.width * 0.82f, size.height * 0.14f)
-        val head = Offset(size.width * 0.52f, size.height * 0.46f)
+        val pivot = Offset(size.width * 0.85f, size.height * 0.12f)
+        val head = Offset(size.width * 0.68f, size.height * 0.36f)
         drawLine(color = Silver, start = pivot, end = head, strokeWidth = 6.dp.toPx(), cap = StrokeCap.Round)
         drawCircle(color = Blue, radius = 16.dp.toPx(), center = pivot)
         drawCircle(color = Cream, radius = 7.dp.toPx(), center = pivot)
-        drawCircle(color = Blue, radius = 9.dp.toPx(), center = head)
+        drawCircle(color = Blue, radius = 8.dp.toPx(), center = head)
     }
 }
 
@@ -212,18 +224,10 @@ private fun DeckPanel(state: NowPlaying, controls: PlayerControls) {
 @Composable
 private fun ProgressBar(progress: Float, modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(5.dp)
-            .clip(CircleShape)
-            .background(NavyLine),
+        modifier = modifier.fillMaxWidth().height(5.dp).clip(CircleShape).background(NavyLine),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth(progress)
-                .fillMaxHeight()
-                .clip(CircleShape)
-                .background(Coral),
+            modifier = Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().clip(CircleShape).background(Coral),
         )
     }
 }
@@ -236,78 +240,11 @@ private fun ControlButton(
     content: @Composable () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .size(diameter)
-            .clip(CircleShape)
-            .background(background)
-            .clickable(onClick = onClick),
+        modifier = Modifier.size(diameter).clip(CircleShape).background(background).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         content()
     }
-}
-
-@Composable
-private fun PlayIcon(tint: Color) {
-    Canvas(Modifier.size(24.dp)) {
-        val w = size.width
-        val h = size.height
-        val path = Path().apply {
-            moveTo(w * 0.24f, h * 0.16f)
-            lineTo(w * 0.84f, h * 0.5f)
-            lineTo(w * 0.24f, h * 0.84f)
-            close()
-        }
-        drawPath(path, color = tint)
-    }
-}
-
-@Composable
-private fun PauseIcon(tint: Color) {
-    Canvas(Modifier.size(24.dp)) {
-        val w = size.width
-        val h = size.height
-        val barW = w * 0.22f
-        val radius = CornerRadius(2.dp.toPx())
-        drawRoundRect(color = tint, topLeft = Offset(w * 0.2f, h * 0.16f), size = Size(barW, h * 0.68f), cornerRadius = radius)
-        drawRoundRect(color = tint, topLeft = Offset(w * 0.58f, h * 0.16f), size = Size(barW, h * 0.68f), cornerRadius = radius)
-    }
-}
-
-@Composable
-private fun NextIcon(tint: Color) {
-    Canvas(Modifier.size(22.dp)) {
-        val w = size.width
-        val h = size.height
-        drawPath(triangle(w * 0.12f, w * 0.5f, h), tint)
-        drawPath(triangle(w * 0.46f, w * 0.84f, h), tint)
-        drawRoundRect(color = tint, topLeft = Offset(w * 0.85f, h * 0.22f), size = Size(w * 0.11f, h * 0.56f), cornerRadius = CornerRadius(1.5.dp.toPx()))
-    }
-}
-
-@Composable
-private fun PrevIcon(tint: Color) {
-    Canvas(Modifier.size(22.dp)) {
-        val w = size.width
-        val h = size.height
-        drawRoundRect(color = tint, topLeft = Offset(w * 0.04f, h * 0.22f), size = Size(w * 0.11f, h * 0.56f), cornerRadius = CornerRadius(1.5.dp.toPx()))
-        drawPath(triangleLeft(w * 0.88f, w * 0.5f, h), tint)
-        drawPath(triangleLeft(w * 0.54f, w * 0.16f, h), tint)
-    }
-}
-
-private fun triangle(leftX: Float, tipX: Float, h: Float): Path = Path().apply {
-    moveTo(leftX, h * 0.2f)
-    lineTo(tipX, h * 0.5f)
-    lineTo(leftX, h * 0.8f)
-    close()
-}
-
-private fun triangleLeft(rightX: Float, tipX: Float, h: Float): Path = Path().apply {
-    moveTo(rightX, h * 0.2f)
-    lineTo(tipX, h * 0.5f)
-    lineTo(rightX, h * 0.8f)
-    close()
 }
 
 private fun formatTime(ms: Long): String {
