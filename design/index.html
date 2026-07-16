@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spindle — Analog (Turntable) design</title>
+<style>
+  /* ============================================================
+     SPINDLE — Analog "Turntable" skin: app screen + app icon.
+     Flat-vector retro illustration (bold flat fills, geometric
+     shapes, soft shadows). Local design reference.
+     ============================================================ */
+  :root {
+    --coral: #e8645a;
+    --coral-dark: #d1544b;
+    --coral-deep: #b64239;
+    --navy: #2b356a;
+    --navy-dark: #232b58;
+    --navy-line: #3c4890;
+    --cream: #f2e7d0;
+    --cream-dark: #e3d3b2;
+    --red: #d94b3f;
+    --blue: #33429c;
+    --silver: #d9d5cc;
+    --vinyl: #17130f;
+    --ink: #191510;
+
+    --page: #ece3d5;
+    --page-2: #e2d7c5;
+    --page-ink: #40392f;
+    --page-muted: #8a7f6d;
+
+    --font: "Avenir Next", "Futura", "Century Gothic", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --page: #201c17; --page-2: #18140f; --page-ink: #efe6d5; --page-muted: #9d917c; }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(1100px 760px at 50% -12%, var(--page), var(--page-2));
+    color: var(--page-ink);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 30px; padding: 44px 20px 64px;
+  }
+
+  .head { text-align: center; max-width: 42ch; }
+  .head .kicker { font-size: 12px; letter-spacing: .32em; text-transform: uppercase; color: var(--coral-dark); font-weight: 800; margin: 0 0 8px; }
+  .head h1 { font-size: clamp(22px, 4vw, 30px); margin: 0 0 6px; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; }
+  .head p { font-size: 14px; line-height: 1.55; color: var(--page-muted); margin: 0; }
+
+  .layout { display: flex; gap: 52px; align-items: center; flex-wrap: wrap; justify-content: center; }
+
+  /* ---------------- phone / app screen ---------------- */
+  .phone {
+    width: 320px; aspect-ratio: 9 / 19.2; border-radius: 42px; padding: 11px;
+    background: #0f0e0c; flex: none;
+    box-shadow: 0 40px 80px -30px rgba(40,25,20,.55), inset 0 0 0 2px rgba(255,255,255,.06);
+  }
+  .screen {
+    position: relative; width: 100%; height: 100%; border-radius: 32px; overflow: hidden;
+    background: var(--coral); display: flex; flex-direction: column;
+  }
+
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px 6px; z-index: 4; }
+  .top .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: .14em; font-size: 14px; color: var(--navy); text-transform: uppercase; }
+  .top .brand .dot { width: 16px; height: 16px; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, var(--vinyl) 0 1.4px, #2a221c 1.4px 2.6px); box-shadow: 0 0 0 2px var(--navy); }
+  .top .np { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--navy); font-weight: 700; opacity: .8; }
+
+  .deckwrap { position: relative; flex: 1; }
+  .platter { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 250px; height: 250px; z-index: 2; }
+  .record {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-radial-gradient(circle at 50% 50%, #14100d 0 2.5px, #221c17 2.5px 4.5px);
+    box-shadow: 0 14px 26px -8px rgba(30,15,10,.5), inset 0 0 0 3px #0d0b09, inset 0 0 40px rgba(0,0,0,.55);
+    display: grid; place-items: center; animation: spin 8s linear infinite;
+  }
+  .record::before { content: ""; position: absolute; inset: 6px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(240,235,225,.85); }
+  .label {
+    width: 44%; height: 44%; border-radius: 50%;
+    background:
+      radial-gradient(120% 120% at 25% 20%, #3a74b4 0%, transparent 55%),
+      radial-gradient(120% 120% at 80% 85%, #e0a24a 0%, transparent 50%),
+      linear-gradient(150deg, #2f5f96, #d7823f);
+    box-shadow: inset 0 0 0 3px var(--cream), 0 2px 8px rgba(0,0,0,.35);
+    display: grid; place-items: center; position: relative; z-index: 2;
+  }
+  .label .hole { width: 12%; height: 12%; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 3px rgba(0,0,0,.35); }
+
+  .tonearm { position: absolute; top: 2px; right: 20px; width: 120px; height: 120px; z-index: 3; pointer-events: none; }
+  .tonearm .pivot { position: absolute; top: 0; right: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--blue); box-shadow: inset 0 0 0 6px rgba(255,255,255,.18), 0 3px 6px rgba(0,0,0,.3); }
+  .tonearm .pivot::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: var(--cream); }
+  .tonearm .arm { position: absolute; top: 26px; right: 14px; width: 96px; height: 7px; background: var(--silver); border-radius: 5px; transform-origin: right center; transform: rotate(41deg); box-shadow: 0 2px 4px rgba(0,0,0,.25); }
+  .tonearm .head { position: absolute; top: 84px; right: 78px; width: 16px; height: 24px; background: var(--blue); border-radius: 3px; transform: rotate(41deg); box-shadow: 0 2px 5px rgba(0,0,0,.3); }
+
+  .puck { position: absolute; top: 20px; left: 22px; width: 40px; height: 40px; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, #1c1712 0 1.6px, #2a221c 1.6px 3px); box-shadow: 0 6px 12px -4px rgba(30,15,10,.45), inset 0 0 0 6px #16110d, inset 0 0 0 9px var(--cream); z-index: 2; }
+
+  .panel { position: relative; z-index: 3; margin-top: auto; background: var(--navy); border-radius: 26px 26px 0 0; padding: 20px 22px 26px; box-shadow: 0 -8px 24px -12px rgba(0,0,0,.35); }
+  .meta { color: var(--cream); }
+  .meta .title { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+  .meta .artist { font-size: 13px; color: var(--cream-dark); margin-top: 2px; }
+
+  .slider { margin: 16px 0 4px; }
+  .slider .track { height: 5px; border-radius: 4px; background: var(--navy-line); position: relative; }
+  .slider .fill { position: absolute; left: 0; top: 0; height: 100%; width: 42%; border-radius: 4px; background: var(--coral); }
+  .slider .knob { position: absolute; left: 42%; top: 50%; width: 13px; height: 13px; border-radius: 50%; background: var(--cream); transform: translate(-50%,-50%); box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+  .slider .times { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: var(--cream-dark); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+
+  .controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 14px; }
+  .controls button { appearance: none; border: 0; cursor: pointer; width: 48px; height: 48px; border-radius: 50%; background: var(--cream); color: var(--ink); display: grid; place-items: center; box-shadow: 0 4px 0 var(--cream-dark), 0 6px 10px -4px rgba(0,0,0,.3); transition: transform .12s ease, box-shadow .12s ease; }
+  .controls button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--cream-dark), 0 3px 6px -4px rgba(0,0,0,.3); }
+  .controls button:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
+  .controls .play { width: 64px; height: 64px; background: var(--red); color: var(--cream); box-shadow: 0 5px 0 var(--coral-deep), 0 8px 14px -5px rgba(0,0,0,.4); }
+  .controls .play:active { box-shadow: 0 1px 0 var(--coral-deep), 0 4px 10px -6px rgba(0,0,0,.4); }
+  .controls svg { width: 20px; height: 20px; fill: currentColor; display: block; }
+  .controls .play svg { width: 26px; height: 26px; }
+
+  .trim { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+  .dots { display: flex; gap: 7px; }
+  .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--coral); opacity: .5; }
+  .dots i.on { opacity: 1; }
+  .cassette { width: 46px; height: 30px; border-radius: 5px; background: #2f9c9c; position: relative; box-shadow: inset 0 0 0 3px var(--navy-dark); }
+  .cassette::before { content: ""; position: absolute; inset: 6px 6px auto 6px; height: 6px; border-radius: 2px; background: var(--cream); }
+  .cassette .r { position: absolute; bottom: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--cream); box-shadow: 0 0 0 2px var(--navy-dark); }
+  .cassette .r.l { left: 9px; } .cassette .r.rt { right: 9px; }
+
+  /* ---------------- app icon ---------------- */
+  .icons { display: flex; flex-direction: column; gap: 22px; align-items: center; }
+  .icon-caption { font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--page-muted); font-weight: 800; }
+  .icon-row { display: flex; gap: 22px; align-items: flex-end; }
+  .appicon {
+    aspect-ratio: 1; border-radius: 22.5%; background: var(--coral);
+    display: grid; place-items: center; position: relative; overflow: hidden; flex: none;
+    box-shadow: 0 14px 26px -12px rgba(40,25,20,.55), inset 0 2px 0 rgba(255,255,255,.18);
+  }
+  .appicon.lg { width: 128px; } .appicon.md { width: 72px; } .appicon.sm { width: 48px; } .appicon.xs { width: 32px; }
+  .appicon.alt { background: var(--navy); }
+  .appicon .rec {
+    width: 66%; height: 66%; border-radius: 50%; position: relative;
+    background: repeating-radial-gradient(circle at 50% 50%, #14100d 0 2px, #221c17 2px 3.6px);
+    box-shadow: 0 3px 8px -3px rgba(0,0,0,.4);
+    display: grid; place-items: center;
+  }
+  .appicon .rec::before { content: ""; position: absolute; inset: 7%; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--cream); }
+  .appicon .ctr { width: 40%; height: 40%; border-radius: 50%; background: var(--navy); display: grid; place-items: center; box-shadow: inset 0 0 0 2px var(--cream); }
+  .appicon.alt .ctr { background: var(--red); }
+  .appicon .ctr .hole { width: 22%; height: 22%; border-radius: 50%; background: var(--coral); }
+  .appicon.alt .ctr .hole { background: var(--navy); }
+  .icon-size { text-align: center; font-size: 10px; color: var(--page-muted); margin-top: 8px; font-variant-numeric: tabular-nums; }
+
+  .caption { max-width: 48ch; text-align: center; }
+  .caption .row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 14px; }
+  .caption .chip { font-size: 12px; padding: 6px 12px; border-radius: 999px; background: rgba(232,100,90,.14); border: 1px solid rgba(232,100,90,.4); color: var(--page-ink); }
+  .caption p { font-size: 13px; line-height: 1.6; color: var(--page-muted); margin: 0; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .record { animation: none; } }
+
+  @media (max-width: 760px) { .layout { gap: 40px; } }
+</style>
+</head>
+<body>
+
+  <div class="head">
+    <p class="kicker">Spindle &middot; Analog vibe &middot; Turntable skin</p>
+    <h1>App screen &amp; icon, in your flat-retro style</h1>
+    <p>The illustrated turntable is the chrome; the record's center holds your <strong>live album art</strong>, and every part is a real control.</p>
+  </div>
+
+  <div class="layout">
+
+    <!-- app screen -->
+    <div class="phone">
+      <div class="screen">
+        <div class="top">
+          <div class="brand"><span class="dot"></span> Spindle</div>
+          <div class="np">Now Playing</div>
+        </div>
+        <div class="deckwrap">
+          <div class="puck"></div>
+          <div class="platter"><div class="record"><div class="label"><span class="hole"></span></div></div></div>
+          <div class="tonearm"><span class="pivot"></span><span class="arm"></span><span class="head"></span></div>
+        </div>
+        <div class="panel">
+          <div class="meta">
+            <div class="title">So What</div>
+            <div class="artist">Miles Davis &middot; Kind of Blue</div>
+          </div>
+          <div class="slider">
+            <div class="track"><span class="fill"></span><span class="knob"></span></div>
+            <div class="times"><span>3:58</span><span>9:22</span></div>
+          </div>
+          <div class="controls">
+            <button aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M7 6h2v12H7zm3.5 6L19 6v12z"/></svg></button>
+            <button class="play" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M8 5h3v14H8zm5 0h3v14h-3z"/></svg></button>
+            <button aria-label="Next"><svg viewBox="0 0 24 24"><path d="M15 6h2v12h-2zM5 6l8.5 6L5 18z"/></svg></button>
+          </div>
+          <div class="trim">
+            <div class="dots"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+            <div class="cassette"><span class="r l"></span><span class="r rt"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- app icon -->
+    <div class="icons">
+      <div class="icon-caption">App icon</div>
+      <div class="icon-row">
+        <div><div class="appicon lg"><div class="rec"><div class="ctr"><span class="hole"></span></div></div></div><div class="icon-size">128</div></div>
+        <div><div class="appicon md"><div class="rec"><div class="ctr"><span class="hole"></span></div></div></div><div class="icon-size">72</div></div>
+        <div><div class="appicon sm"><div class="rec"><div class="ctr"><span class="hole"></span></div></div></div><div class="icon-size">48</div></div>
+        <div><div class="appicon xs"><div class="rec"><div class="ctr"><span class="hole"></span></div></div></div><div class="icon-size">32</div></div>
+      </div>
+      <div class="icon-caption" style="margin-top:6px">Alt (navy)</div>
+      <div class="icon-row">
+        <div><div class="appicon alt md"><div class="rec"><div class="ctr"><span class="hole"></span></div></div></div><div class="icon-size">72</div></div>
+        <div><div class="appicon alt sm"><div class="rec"><div class="ctr"><span class="hole"></span></div></div></div><div class="icon-size">48</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="caption">
+    <div class="row">
+      <span class="chip">Compose Canvas + vector</span>
+      <span class="chip">Record spins &middot; tonearm lifts on pause</span>
+      <span class="chip">Icon reads down to 32px</span>
+    </div>
+    <p>Original artwork in this flat-retro style &mdash; not the stock images. The <strong>Flux</strong> vibe reuses the same technique with a holographic palette. Cassette &amp; iPod could become additional switchable skins.</p>
+  </div>
+
+</body>
+</html>
