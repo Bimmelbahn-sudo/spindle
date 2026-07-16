@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Spindle</string>
+    <string name="widget_description">Now playing — control your music from the home screen.</string>
 </resources>
