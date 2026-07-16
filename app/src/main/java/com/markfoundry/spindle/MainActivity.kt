@@ -5,21 +5,30 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.markfoundry.spindle.media.NotificationAccess
-import com.markfoundry.spindle.skin.defaultSkin
+import com.markfoundry.spindle.skin.skinById
 import com.markfoundry.spindle.ui.NothingPlayingScreen
 import com.markfoundry.spindle.ui.OnboardingScreen
+import com.markfoundry.spindle.ui.SettingsButton
+import com.markfoundry.spindle.ui.SkinPicker
 import com.markfoundry.spindle.ui.theme.SpindleTheme
 
 class MainActivity : ComponentActivity() {
@@ -66,11 +75,29 @@ private fun SpindleApp(viewModel: MainViewModel) {
             )
         } else {
             val nowPlaying by viewModel.state.collectAsStateWithLifecycle()
-            val np = nowPlaying
-            if (np == null) {
-                NothingPlayingScreen()
-            } else {
-                defaultSkin().Render(state = np, controls = viewModel.controls)
+            val skinId by viewModel.skinId.collectAsStateWithLifecycle()
+            var pickerOpen by remember { mutableStateOf(false) }
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                val np = nowPlaying
+                if (np == null) {
+                    NothingPlayingScreen()
+                } else {
+                    skinById(skinId).Render(state = np, controls = viewModel.controls)
+                }
+
+                SettingsButton(
+                    onClick = { pickerOpen = true },
+                    modifier = Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 8.dp, end = 14.dp),
+                )
+
+                if (pickerOpen) {
+                    SkinPicker(
+                        current = skinId,
+                        onSelect = { viewModel.selectSkin(it); pickerOpen = false },
+                        onDismiss = { pickerOpen = false },
+                    )
+                }
             }
         }
     }
