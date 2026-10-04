@@ -2,6 +2,7 @@ package com.markfoundry.spindle
 
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -36,20 +37,27 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
-override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    window.decorView.systemUiVisibility =
-        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-        View.SYSTEM_UI_FLAG_FULLSCREEN or
-        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        // Bildschirm eingeschaltet lassen
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-    enableEdgeToEdge()
-    setContent { SpindleApp(viewModel) }
-}
+        // Vollbild: Statusleiste und Navigationsleiste ausblenden
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+            View.SYSTEM_UI_FLAG_FULLSCREEN or
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+
+        enableEdgeToEdge()
+
+        setContent {
+            SpindleApp(viewModel)
+        }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -75,37 +83,64 @@ private fun SpindleApp(viewModel: MainViewModel) {
                     granted = viewModel.isAccessGranted()
                 }
             }
+
             lifecycleOwner.lifecycle.addObserver(observer)
-            onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
         }
 
         if (!granted) {
             OnboardingScreen(
-                onGrantClick = { context.startActivity(NotificationAccess.settingsIntent()) },
+                onGrantClick = {
+                    context.startActivity(
+                        NotificationAccess.settingsIntent()
+                    )
+                },
             )
         } else {
             val nowPlaying by viewModel.state.collectAsStateWithLifecycle()
             val skinId by viewModel.skinId.collectAsStateWithLifecycle()
             var pickerOpen by remember { mutableStateOf(false) }
 
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
                 val np = nowPlaying
+
                 if (np == null) {
                     NothingPlayingScreen()
                 } else {
-                    skinById(skinId).Render(state = np, controls = viewModel.controls)
+                    skinById(skinId).Render(
+                        state = np,
+                        controls = viewModel.controls
+                    )
                 }
 
                 SettingsButton(
-                    onClick = { pickerOpen = true },
-                    modifier = Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 8.dp, end = 14.dp),
+                    onClick = {
+                        pickerOpen = true
+                    },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .statusBarsPadding()
+                        .padding(
+                            top = 8.dp,
+                            end = 14.dp
+                        ),
                 )
 
                 if (pickerOpen) {
                     SkinPicker(
                         current = skinId,
-                        onSelect = { viewModel.selectSkin(it); pickerOpen = false },
-                        onDismiss = { pickerOpen = false },
+                        onSelect = {
+                            viewModel.selectSkin(it)
+                            pickerOpen = false
+                        },
+                        onDismiss = {
+                            pickerOpen = false
+                        },
                     )
                 }
             }
