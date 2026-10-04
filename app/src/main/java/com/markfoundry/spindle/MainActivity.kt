@@ -1,4 +1,3 @@
-```kotlin
 package com.markfoundry.spindle
 
 import android.os.Bundle
@@ -9,7 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
         // Bildschirm eingeschaltet lassen
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        // Vollbild / Systemleisten ausblenden
+        // Vollbild / Status- und Navigationsleiste ausblenden
         window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
             View.SYSTEM_UI_FLAG_FULLSCREEN or
@@ -70,4 +71,3 @@ class MainActivity : ComponentActivity() {
         viewModel.onPause()
     }
 }
-```
